@@ -19,9 +19,9 @@ from tastypie import bundle as tastypie_bundle, exceptions as tastypie_exception
 import mongoengine
 from mongoengine import fields as mongoengine_fields, queryset
 try:
-    from mongoengine.queryset import tranform as mongoengine_tranform
+    from mongoengine.queryset import transform as mongoengine_transform
 except ImportError:
-    mongoengine_tranform = None
+    mongoengine_transform = None
 
 from tastypie_mongoengine import fields as tastypie_mongoengine_fields
 
@@ -33,13 +33,13 @@ from django.core.urlresolvers import Resolver404
 # We use a mock Query object to provide the same interface and return query terms by MongoEngine.
 # MongoEngine code might not expose these query terms, so we fallback to hard-coded values.
 
-QUERY_TERMS_ALL = getattr(mongoengine_tranform, 'MATCH_OPERATORS', (
+QUERY_TERMS_ALL = getattr(mongoengine_transform, 'MATCH_OPERATORS', (
     'ne', 'gt', 'gte', 'lt', 'lte', 'in', 'nin', 'mod', 'all', 'size', 'exists', 'not', 'within_distance', 'within_spherical_distance', 'within_box', 'within_polygon', 'near', 'near_sphere', 'contains', 'icontains', 'startswith', 'istartswith', 'endswith', 'iendswith', 'exact', 'iexact', 'match'
 ))
 
 
 class Query(object):
-    query_terms = dict([(query_term, None) for query_term in QUERY_TERMS_ALL])
+    query_terms = set(QUERY_TERMS_ALL)
 
 if not hasattr(queryset.QuerySet, 'query'):
     queryset.QuerySet.query = Query()
