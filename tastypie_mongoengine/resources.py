@@ -199,8 +199,16 @@ class MongoEngineModelDeclarativeMetaclass(resources.ModelDeclarativeMetaclass):
                     setattr(meta, 'queryset', ListQuerySet())
 
         new_class = super(resources.ModelDeclarativeMetaclass, cls).__new__(cls, name, bases, attrs)
-        include_fields = getattr(new_class._meta, 'fields', [])
+        specified_fields = getattr(new_class._meta, 'fields', None)
         excludes = getattr(new_class._meta, 'excludes', [])
+
+        include_fields = specified_fields
+
+        if include_fields is None:
+            if meta and meta.object_class:
+                include_fields = [f.name for f in getattr(meta.object_class._meta, 'fields', [])]
+            else:
+                include_fields = []
 
         field_names = new_class.base_fields.keys()
 
